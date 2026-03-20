@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recién Horneá</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0b08;--surface:#1a1410;--surface2:#241d16;--border:#2e2418;--caramel:#C8853A;--gold:#E8A84A;--cream:#F5EDD8;--muted:#7a6a55;--white:#FAF6EE}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--cream);display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+.header{padding:1rem 1.4rem .8rem;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
+.logo{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:900;color:var(--cream);letter-spacing:-.5px}
+.logo span{color:var(--caramel);font-style:italic}
+.header-right{display:flex;align-items:center;gap:.6rem}
+.location-btn{display:flex;align-items:center;gap:.3rem;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:.35rem .8rem;font-size:.75rem;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif}
+.cart-btn{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:.35rem .9rem;font-size:.75rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:.4rem;font-family:'DM Sans',sans-serif;transition:all .2s}
+.cart-btn.has-items{border-color:var(--caramel);color:var(--caramel)}
+.cart-count{background:var(--caramel);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.search-bar{display:flex;align-items:center;gap:.6rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.6rem 1rem}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:.88rem}
+.search-bar input::placeholder{color:var(--muted)}
+.bottom-nav{display:flex;background:var(--bg);border-top:1px solid var(--border);flex-shrink:0}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:.7rem .5rem;cursor:pointer;border:none;background:transparent;font-family:'DM Sans',sans-serif;transition:all .2s}
+.nav-item .nav-icon{font-size:1.2rem}
+.nav-item .nav-label{font-size:.62rem;font-weight:500;color:var(--muted);letter-spacing:.03em}
+.nav-item.active .nav-label{color:var(--caramel)}
+.content{flex:1;overflow-y:auto;overflow-x:hidden}
+.view{display:none}
+.view.active{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.notif-demo{margin:1rem 1.4rem;background:var(--white);border-radius:18px;padding:.9rem 1.1rem;display:flex;gap:.8rem;align-items:flex-start;box-shadow:0 8px 30px #00000050;position:relative;overflow:hidden;animation:dropIn .6s cubic-bezier(.22,1,.36,1) both}
+.notif-demo::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--caramel),var(--gold))}
+@keyframes dropIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+.notif-appicon{width:38px;height:38px;background:var(--bg);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.notif-content{flex:1}
+.notif-app{font-size:.62rem;color:#aaa;text-transform:uppercase;letter-spacing:.07em;margin-bottom:1px}
+.notif-title{font-family:'Fraunces',serif;font-size:.88rem;font-weight:700;color:#1a1208;line-height:1.3;margin-bottom:2px}
+.notif-body{font-size:.72rem;color:#666}
+.notif-time{font-size:.62rem;color:#bbb;flex-shrink:0}
+.sec-header{display:flex;align-items:center;justify-content:space-between;padding:.4rem 1.4rem .7rem}
+.sec-title{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--cream)}
+.sec-link{font-size:.75rem;color:var(--caramel);cursor:pointer}
+.cafes-list{padding:0 1.4rem 5rem;display:flex;flex-direction:column;gap:.8rem}
+.cafe-row{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.1rem;display:flex;align-items:center;gap:1rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.cafe-row.hot{border-color:#C8853A30}
+.cafe-row.hot::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--caramel)}
+.cafe-row:active{transform:scale(.98)}
+.cafe-row-icon{font-size:2.2rem;flex-shrink:0}
+.cafe-row-info{flex:1;min-width:0}
+.cafe-row-name{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:var(--cream);margin-bottom:2px}
+.cafe-row-meta{font-size:.72rem;color:var(--muted);margin-bottom:5px}
+.cafe-row-tags{display:flex;gap:.4rem;flex-wrap:wrap}
+.tag{padding:2px 7px;border-radius:8px;font-size:.62rem;font-weight:500}
+.tag-hot{background:#C8853A20;color:var(--caramel);border:1px solid #C8853A30}
+.tag-soon{background:#ffffff08;color:var(--muted);border:1px solid var(--border)}
+.tag-new{background:#4a7a4a20;color:#6aaa6a;border:1px solid #4a7a4a30}
+.cafe-row-arrow{color:var(--muted);font-size:1.2rem;flex-shrink:0}
+.perfil-header{background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 1.4rem 1.2rem}
+.perfil-back{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted);cursor:pointer;margin-bottom:1rem;background:none;border:none;font-family:'DM Sans',sans-serif}
+.perfil-top{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+.perfil-emoji{font-size:2.8rem}
+.perfil-nombre{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:900;color:var(--cream);margin-bottom:2px}
+.perfil-barrio{font-size:.78rem;color:var(--muted)}
+.perfil-stats{display:flex;gap:1.5rem}
+.p-stat-n{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--gold)}
+.p-stat-l{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.producto-dia{margin:1rem 1.4rem;background:linear-gradient(135deg,#1c1510,#2e1e10);border:1px solid #C8853A40;border-radius:18px;padding:1.3rem;position:relative;overflow:hidden}
+.producto-dia::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--caramel),var(--gold))}
+.pd-eyebrow{font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--caramel);font-weight:500;margin-bottom:.5rem}
+.pd-top{display:flex;align-items:flex-start;gap:1rem;margin-bottom:.8rem}
+.pd-emoji{font-size:3rem}
+.pd-info{flex:1}
+.pd-name{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:900;color:var(--cream);line-height:1.1;margin-bottom:.3rem}
+.pd-desc{font-size:.78rem;color:#ffffff70;line-height:1.4}
+.pd-bottom{display:flex;align-items:center;justify-content:space-between}
+.pd-price{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:900;color:var(--gold)}
+.pd-urgencia{font-size:.72rem;color:var(--caramel);font-weight:500;margin-top:2px}
+.btn-add-dia{padding:.55rem 1.2rem;background:var(--caramel);color:var(--cream);border:none;border-radius:20px;font-size:.82rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-add-dia:hover{background:var(--gold);color:#1a1208}
+.carta-label{padding:.5rem 1.4rem .5rem;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--caramel);font-weight:500}
+.carta-lista{padding:0 1.4rem 7rem;display:flex;flex-direction:column;gap:.6rem}
+.carta-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:.9rem 1rem;display:flex;align-items:center;gap:.8rem;cursor:pointer;transition:all .2s}
+.carta-item:hover{border-color:#C8853A30}
+.carta-emoji{font-size:1.7rem;flex-shrink:0}
+.carta-info{flex:1;min-width:0}
+.carta-name{font-family:'Fraunces',serif;font-size:.92rem;font-weight:700;color:var(--cream);margin-bottom:1px}
+.carta-desc{font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.carta-price{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:var(--gold);flex-shrink:0}
+.btn-add-small{width:28px;height:28px;border-radius:50%;background:var(--caramel);border:none;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.btn-add-small.added{background:var(--surface2);color:var(--caramel);border:1px solid var(--caramel);font-size:.8rem}
+.carrito-bar{position:fixed;bottom:4rem;left:50%;transform:translateX(-50%) translateY(80px);width:calc(100% - 2.8rem);max-width:420px;background:var(--caramel);border-radius:16px;padding:.9rem 1.2rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-shadow:0 8px 30px #00000060;transition:transform .35s cubic-bezier(.22,1,.36,1);z-index:50}
+.carrito-bar.visible{transform:translateX(-50%) translateY(0)}
+.carrito-bar-left{display:flex;align-items:center;gap:.6rem}
+.carrito-badge{background:#ffffff30;border-radius:8px;padding:.2rem .5rem;font-size:.75rem;font-weight:700;color:#fff}
+.carrito-text{font-size:.88rem;font-weight:500;color:#fff}
+.carrito-total{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:#fff}
+.mapa-wrap{padding:1rem 1.4rem}
+.mapa-title{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:900;margin-bottom:.3rem}
+.mapa-sub{font-size:.78rem;color:var(--muted);margin-bottom:1rem}
+.filtros{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
+.filtro-btn{padding:.3rem .8rem;border:1.5px solid var(--border);border-radius:20px;background:transparent;color:var(--muted);font-size:.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.filtro-btn.on{border-color:var(--caramel);color:var(--caramel);background:#C8853A10}
+.mapa-svg-wrap{border-radius:16px;overflow:hidden;border:1px solid var(--border);margin-bottom:1rem}
+.mapa-lista{display:flex;flex-direction:column;gap:.6rem;padding-bottom:5rem}
+.mapa-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.9rem 1.1rem;display:flex;align-items:center;gap:.9rem;cursor:pointer;transition:all .2s}
+.mapa-item:hover{border-color:var(--caramel)}
+.mapa-item-emoji{font-size:1.6rem}
+.mapa-item-info{flex:1}
+.mapa-item-name{font-family:'Fraunces',serif;font-size:.95rem;font-weight:700;color:var(--cream);margin-bottom:2px}
+.mapa-item-meta{font-size:.72rem;color:var(--muted)}
+.mapa-badge{padding:3px 9px;border-radius:10px;font-size:.68rem;font-weight:500}
+.mb-hot{background:var(--caramel);color:#fff}
+.mb-soon{background:var(--surface2);color:var(--muted)}
+.checkout-wrap{padding:1.4rem;max-width:440px;margin:0 auto}
+.checkout-back{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted);cursor:pointer;margin-bottom:1.2rem;background:none;border:none;font-family:'DM Sans',sans-serif}
+.checkout-title{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:900;color:var(--cream);margin-bottom:.2rem}
+.checkout-cafe{font-size:.78rem;color:var(--muted);margin-bottom:1.5rem}
+.checkout-items{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:.5rem 0;margin-bottom:1.2rem}
+.checkout-item{display:flex;align-items:center;gap:.8rem;padding:.75rem 1rem;border-bottom:1px solid var(--border)}
+.checkout-item:last-child{border-bottom:none}
+.ci-emoji{font-size:1.5rem;flex-shrink:0}
+.ci-info{flex:1}
+.ci-name{font-size:.88rem;font-weight:500;color:var(--cream)}
+.ci-price{font-size:.78rem;color:var(--muted)}
+.ci-qty{display:flex;align-items:center;gap:.4rem}
+.ci-qty-btn{width:24px;height:24px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--cream);font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ci-qty-n{font-size:.88rem;font-weight:500;color:var(--cream);min-width:16px;text-align:center}
+.checkout-total{display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-top:1px solid var(--border);margin-bottom:1rem}
+.checkout-total-lbl{font-size:.85rem;color:var(--muted)}
+.checkout-total-val{font-family:'Fraunces',serif;font-size:1.9rem;font-weight:900;color:var(--gold)}
+.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1.2rem}
+.pay-opt{border:1.5px solid var(--border);border-radius:12px;padding:.9rem;cursor:pointer;transition:all .2s;background:var(--surface)}
+.pay-opt:hover,.pay-opt.sel{border-color:var(--caramel);background:#C8853A10}
+.pay-opt-icon{font-size:1.2rem;margin-bottom:.4rem}
+.pay-opt-title{font-size:.82rem;font-weight:500;color:var(--cream);margin-bottom:1px}
+.pay-opt-sub{font-size:.68rem;color:var(--muted)}
+.btn-confirmar{width:100%;padding:1rem;background:var(--caramel);color:var(--cream);border:none;border-radius:14px;font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-confirmar:hover{background:var(--gold);color:#1a1208;transform:translateY(-2px);box-shadow:0 8px 25px #C8853A40}
+.confirm-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;padding:2rem 1.4rem;text-align:center}
+.confirm-ring{width:84px;height:84px;border-radius:50%;border:2px solid var(--caramel);display:flex;align-items:center;justify-content:center;font-size:2.2rem;margin-bottom:1.4rem;animation:ringIn .5s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes ringIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+.confirm-title{font-family:'Fraunces',serif;font-size:2rem;font-weight:900;color:var(--cream);margin-bottom:.4rem}
+.confirm-sub{font-size:.88rem;color:var(--muted);margin-bottom:1.4rem;line-height:1.5}
+.cola-badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--caramel);color:var(--cream);padding:.45rem 1.1rem;border-radius:20px;font-size:.8rem;font-weight:500;margin-bottom:1.4rem}
+.confirm-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1rem 1.4rem;width:100%;max-width:300px;margin-bottom:1.4rem;text-align:left}
+.confirm-row{display:flex;justify-content:space-between;padding:.35rem 0;font-size:.82rem;border-bottom:1px solid var(--border)}
+.confirm-row:last-child{border-bottom:none}
+.confirm-key{color:var(--muted)}
+.confirm-val{color:var(--cream);font-weight:500}
+.confirm-code{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--gold)}
+.btn-back{background:transparent;border:1px solid var(--border);color:var(--muted);padding:.55rem 1.4rem;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.82rem;transition:all .2s}
+.btn-back:hover{border-color:var(--muted);color:var(--cream)}
+.panel-wrap{padding:1.4rem}
+.panel-title{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:900;color:var(--cream);margin-bottom:.2rem}
+.panel-sub{font-size:.78rem;color:var(--muted);margin-bottom:1.4rem}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1.5rem}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.9rem;text-align:center}
+.stat-n{font-family:'Fraunces',serif;font-size:1.9rem;font-weight:900;color:var(--gold);line-height:1;margin-bottom:3px}
+.stat-l{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.panel-sec{font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--caramel);font-weight:500;margin:1.2rem 0 .7rem}
+.notify-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem;margin-bottom:1.2rem}
+.inp-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem}
+.inp-group{display:flex;flex-direction:column;gap:.35rem}
+.inp-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:500}
+.inp{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.6rem .85rem;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;transition:border-color .2s}
+.inp:focus{border-color:var(--caramel)}
+.inp::placeholder{color:var(--muted)}
+.ch-row{display:flex;gap:.5rem;margin-bottom:.9rem;flex-wrap:wrap}
+.ch-btn{padding:.32rem .75rem;border:1.5px solid var(--border);border-radius:20px;background:transparent;color:var(--muted);font-size:.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.ch-btn.on{border-color:var(--caramel);color:var(--caramel);background:#C8853A10}
+.btn-notificar{width:100%;padding:.85rem;background:var(--caramel);color:var(--cream);border:none;border-radius:12px;font-family:'Fraunces',serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-notificar:hover{background:var(--gold);color:#1a1208}
+.reservas-list{display:flex;flex-direction:column;gap:.6rem;padding-bottom:4rem}
+.res-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.85rem 1rem;display:flex;align-items:center;gap:.8rem}
+.res-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--surface2),var(--caramel));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:var(--cream);flex-shrink:0}
+.res-info{flex:1}
+.res-name{font-size:.85rem;font-weight:500;color:var(--cream)}
+.res-detail{font-size:.7rem;color:var(--muted);margin-top:1px}
+.res-badge{padding:2px 8px;border-radius:10px;font-size:.65rem;font-weight:500}
+.rb-app{background:var(--caramel);color:#fff}
+.rb-local{background:var(--surface2);color:var(--muted)}
+.toast{position:fixed;bottom:5.5rem;left:50%;transform:translateX(-50%) translateY(60px);background:var(--surface2);border:1px solid var(--caramel);color:var(--cream);padding:.6rem 1.2rem;border-radius:20px;font-size:.82rem;font-weight:500;transition:transform .3s cubic-bezier(.22,1,.36,1);z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <div class="logo">Recién <span>Horneá</span></div>
+    <div class="header-right">
+      <button class="location-btn">📍 Jaén ▾</button>
+      <button class="cart-btn" id="cart-btn">🛒 <span class="cart-count" id="cart-count" style="display:none">0</span></button>
+    </div>
+  </div>
+  <div class="search-bar"><span>🔍</span><input type="text" placeholder="Busca cafeterías o productos..."></div>
+</div>
+
+<div class="content">
+
+  <!-- INICIO -->
+  <div class="view active" id="view-inicio">
+    <div class="notif-demo">
+      <div class="notif-appicon">🥐</div>
+      <div class="notif-content">
+        <div class="notif-app">Recién Horneá · ahora</div>
+        <div class="notif-title">¡Bomboloni de Kinder recién salidos! Café Giulietta</div>
+        <div class="notif-body">Solo 6 unidades · Reserva antes de que se agoten 🔥</div>
+      </div>
+      <div class="notif-time">ahora</div>
+    </div>
+    <div class="sec-header">
+      <span class="sec-title">Cerca de ti</span>
+      <span class="sec-link" onclick="showNav('mapa')">Ver mapa →</span>
+    </div>
+    <div class="cafes-list">
+      <div class="cafe-row hot" onclick="showPerfil('giulietta')">
+        <div class="cafe-row-icon">☕</div>
+        <div class="cafe-row-info">
+          <div class="cafe-row-name">Café Giulietta</div>
+          <div class="cafe-row-meta">Jaén Plaza · 0,3 km</div>
+          <div class="cafe-row-tags"><span class="tag tag-hot">🔥 Producto del día listo</span><span class="tag tag-hot">6 unidades</span></div>
+        </div>
+        <div class="cafe-row-arrow">›</div>
+      </div>
+        <div class="cafe-row-arrow">›</div>
+      </div>
+        <div class="cafe-row-arrow">›</div>
+      </div>
+      <div class="cafe-row hot" onclick="showPerfil('comercial')">
+        <div class="cafe-row-icon">🏛️</div>
+        <div class="cafe-row-info">
+          <div class="cafe-row-name">El Comercial</div>
+          <div class="cafe-row-meta">Centro · C/ Bernabé Soriano · 0,5 km</div>
+          <div class="cafe-row-tags"><span class="tag tag-hot">🔥 Tostada especial lista</span></div>
+        </div>
+        <div class="cafe-row-arrow">›</div>
+      </div>
+      <div class="cafe-row" onclick="showToast('¡Próximamente más cafeterías en Jaén!')">
+        <div class="cafe-row-icon">➕</div>
+        <div class="cafe-row-info">
+          <div class="cafe-row-name">¿Tu cafetería aquí?</div>
+          <div class="cafe-row-meta">Únete a Recién Horneá · 1 mes gratis</div>
+          <div class="cafe-row-tags"><span class="tag tag-new">✨ Únete gratis</span></div>
+        </div>
+        <div class="cafe-row-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERFIL -->
+  <div class="view" id="view-perfil">
+    <div class="perfil-header">
+      <button class="perfil-back" onclick="showNav('inicio')">← Volver</button>
+      <div class="perfil-top">
+        <div class="perfil-emoji" id="perfil-emoji">☕</div>
+        <div>
+          <div class="perfil-nombre" id="perfil-nombre">Café Giulietta</div>
+          <div class="perfil-barrio" id="perfil-barrio">Jaén Plaza · 0,3 km</div>
+        </div>
+      </div>
+      <div class="perfil-stats">
+        <div><div class="p-stat-n" id="p-seg">218</div><div class="p-stat-l">Seguidores</div></div>
+        <div><div class="p-stat-n" id="p-res">34</div><div class="p-stat-l">Reservas hoy</div></div>
+        <div><div class="p-stat-n" id="p-prod">5</div><div class="p-stat-l">Productos</div></div>
+      </div>
+    </div>
+    <div class="producto-dia" id="producto-dia">
+      <div class="pd-eyebrow">⭐ Producto del día</div>
+      <div class="pd-top">
+        <div class="pd-emoji" id="pd-emoji">🍩</div>
+        <div class="pd-info">
+          <div class="pd-name" id="pd-name">Bomboloni de Kinder</div>
+          <div class="pd-desc" id="pd-desc">Bollito italiano esponjoso relleno de crema Kinder.</div>
+        </div>
+      </div>
+      <div class="pd-bottom">
+        <div>
+          <div class="pd-price" id="pd-price">3,60€</div>
+          <div class="pd-urgencia">🔥 <span id="pd-units">6</span> unidades quedan</div>
+        </div>
+        <button class="btn-add-dia" id="btn-add-dia">+ Añadir</button>
+      </div>
+    </div>
+    <div class="carta-label">Carta completa</div>
+    <div class="carta-lista" id="carta-lista"></div>
+  </div>
+
+  <!-- MAPA -->
+  <div class="view" id="view-mapa">
+    <div class="mapa-wrap">
+      <div class="mapa-title">Mapa</div>
+      <div class="mapa-sub">Cafeterías en Recién Horneá · Jaén</div>
+      <div class="filtros">
+        <button class="filtro-btn on" onclick="toggleFiltro(this)">Todas</button>
+        <button class="filtro-btn" onclick="toggleFiltro(this)">🔥 Activas ahora</button>
+        <button class="filtro-btn" onclick="toggleFiltro(this)">⭐ Mejor valoradas</button>
+      </div>
+      <div class="mapa-svg-wrap">
+        <svg width="100%" viewBox="0 0 440 280" xmlns="http://www.w3.org/2000/svg">
+          <rect width="440" height="280" fill="#141a12"/>
+          <line x1="0" y1="140" x2="440" y2="140" stroke="#1e2a1c" stroke-width="7"/>
+          <line x1="220" y1="0" x2="220" y2="280" stroke="#1e2a1c" stroke-width="7"/>
+          <line x1="0" y1="85" x2="440" y2="105" stroke="#1a2418" stroke-width="4"/>
+          <line x1="0" y1="195" x2="440" y2="175" stroke="#1a2418" stroke-width="4"/>
+          <line x1="100" y1="0" x2="85" y2="280" stroke="#1a2418" stroke-width="3"/>
+          <line x1="340" y1="0" x2="355" y2="280" stroke="#1a2418" stroke-width="3"/>
+          <rect x="20" y="20" width="50" height="30" rx="3" fill="#1c2818"/>
+          <rect x="120" y="25" width="40" height="26" rx="3" fill="#1c2818"/>
+          <rect x="270" y="18" width="55" height="35" rx="3" fill="#1c2818"/>
+          <rect x="375" y="25" width="45" height="28" rx="3" fill="#1c2818"/>
+          <rect x="20" y="165" width="50" height="28" rx="3" fill="#1c2818"/>
+          <rect x="270" y="165" width="48" height="32" rx="3" fill="#1c2818"/>
+          <rect x="20" y="215" width="60" height="35" rx="3" fill="#1c2818"/>
+          <rect x="270" y="215" width="58" height="34" rx="3" fill="#1c2818"/>
+          <g style="cursor:pointer" onclick="showPerfil('giulietta')">
+            <circle cx="158" cy="128" r="16" fill="#C8853A" opacity="0.2"/>
+            <circle cx="158" cy="128" r="10" fill="#C8853A"/>
+            <text x="158" y="133" text-anchor="middle" font-size="10" fill="white" font-family="sans-serif">🔥</text>
+            <rect x="120" y="104" width="76" height="17" rx="8" fill="#C8853A"/>
+            <text x="158" y="116" text-anchor="middle" font-size="8.5" fill="white" font-family="sans-serif" font-weight="600">Café Giulietta</text>
+          </g>
+          <rect x="8" y="252" width="180" height="22" rx="6" fill="#0d150d" opacity="0.9"/>
+          <circle cx="22" cy="263" r="5" fill="#C8853A"/>
+          <text x="31" y="267" font-size="8" fill="#ffffff80" font-family="sans-serif">Disponible ahora</text>
+          <circle cx="100" cy="263" r="5" fill="#4a7a4a"/>
+          <text x="109" y="267" font-size="8" fill="#ffffff80" font-family="sans-serif">Próximamente</text>
+        </svg>
+      </div>
+      <div class="mapa-lista">
+        <div class="mapa-item" onclick="showPerfil('giulietta')"><div class="mapa-item-emoji">☕</div><div class="mapa-item-info"><div class="mapa-item-name">Café Giulietta</div><div class="mapa-item-meta">Jaén Plaza · 0,3 km · Bomboloni, Tarta de queso</div></div><span class="mapa-badge mb-hot">🔥 Activa</span></div><div class="mapa-item-info"><div class="mapa-item-name">Dulces La Merced</div><div class="mapa-item-meta">San Ildefonso · 0,9 km · Roscos de vino</div></div><span class="mapa-badge mb-hot">🔥 Activa</span></div><div class="mapa-item-info"><div class="mapa-item-name">La Antigua Pastelería</div><div class="mapa-item-meta">Alameda · 0,6 km · Croissant en 20 min</div></div><span class="mapa-badge mb-soon">⏱ Próximo</span></div>
+        <div class="mapa-item" onclick="showPerfil('comercial')"><div class="mapa-item-emoji">🏛️</div><div class="mapa-item-info"><div class="mapa-item-name">El Comercial</div><div class="mapa-item-meta">Centro · C/ Bernabé Soriano · 0,5 km</div></div><span class="mapa-badge mb-hot">🔥 Activa</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT -->
+  <div class="view" id="view-checkout">
+    <div class="checkout-wrap">
+      <button class="checkout-back" onclick="showNav('inicio')">← Volver</button>
+      <div class="checkout-title">Tu pedido</div>
+      <div class="checkout-cafe" id="checkout-cafe">Café Giulietta · Jaén Plaza</div>
+      <div class="checkout-items" id="checkout-items"></div>
+      <div class="checkout-total"><span class="checkout-total-lbl">Total</span><span class="checkout-total-val" id="checkout-total">0,00€</span></div>
+      <div class="pay-grid">
+        <div class="pay-opt sel" id="pay-app" onclick="selPay('app')"><div class="pay-opt-icon">💳</div><div class="pay-opt-title">Pagar ahora</div><div class="pay-opt-sub">Por la app</div></div>
+        <div class="pay-opt" id="pay-local" onclick="selPay('local')"><div class="pay-opt-icon">🏪</div><div class="pay-opt-title">Pagar allí</div><div class="pay-opt-sub">Al recoger</div></div>
+      </div>
+      <button class="btn-confirmar" onclick="confirmar()">Confirmar reserva ✓</button>
+    </div>
+  </div>
+
+  <!-- CONFIRMACIÓN -->
+  <div class="view" id="view-confirm">
+    <div class="confirm-wrap">
+      <div class="confirm-ring">✓</div>
+      <h2 class="confirm-title">¡Reservá hecha!</h2>
+      <p class="confirm-sub" id="confirm-sub">Tu pedido te espera</p>
+      <div class="cola-badge">⚡ Entra por la Cola Rápida Recién Horneá</div>
+      <div class="confirm-card">
+        <div class="confirm-row"><span class="confirm-key">Local</span><span class="confirm-val" id="conf-local">-</span></div>
+        <div class="confirm-row"><span class="confirm-key">Productos</span><span class="confirm-val" id="conf-prods">-</span></div>
+        <div class="confirm-row"><span class="confirm-key">Total</span><span class="confirm-val" id="conf-total">-</span></div>
+        <div class="confirm-row"><span class="confirm-key">Pago</span><span class="confirm-val" id="conf-pago">En la app ✓</span></div>
+        <div class="confirm-row"><span class="confirm-key">Código</span><span class="confirm-val confirm-code">RH-<span id="conf-code">4821</span></span></div>
+      </div>
+      <button class="btn-back" onclick="clearCart();showNav('inicio')">← Volver al inicio</button>
+    </div>
+  </div>
+
+  <!-- PANEL -->
+  <div class="view" id="view-panel">
+    <div class="panel-wrap">
+      <div class="panel-title">Panel</div>
+      <div class="panel-sub">Café Giulietta · Recién Horneá Pro</div>
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-n">34</div><div class="stat-l">Reservas hoy</div></div>
+        <div class="stat"><div class="stat-n">218</div><div class="stat-l">Seguidores</div></div>
+        <div class="stat"><div class="stat-n">247€</div><div class="stat-l">Facturado</div></div>
+      </div>
+      <div class="panel-sec">Lanzar notificación</div>
+      <div class="notify-box">
+        <div class="inp-grid">
+          <div class="inp-group"><span class="inp-lbl">Producto del día</span><input class="inp" value="Bomboloni de Kinder"></div>
+          <div class="inp-group"><span class="inp-lbl">Unidades</span><input class="inp" type="number" value="6"></div>
+        </div>
+        <div class="inp-grid">
+          <div class="inp-group"><span class="inp-lbl">Precio</span><input class="inp" value="3,60€"></div>
+          <div class="inp-group"><span class="inp-lbl">Listo en</span><input class="inp" value="Ahora mismo"></div>
+        </div>
+        <div style="margin-bottom:.8rem"><span class="inp-lbl" style="display:block;margin-bottom:.5rem">Canales</span>
+          <div class="ch-row">
+            <button class="ch-btn on" onclick="this.classList.toggle('on')">📱 Push</button>
+            <button class="ch-btn on" onclick="this.classList.toggle('on')">✉️ Email</button>
+            <button class="ch-btn" onclick="this.classList.toggle('on')">💬 WhatsApp</button>
+          </div>
+        </div>
+        <button class="btn-notificar" onclick="showToast('✓ Notificación enviada a 218 clientes')">🔥 Notificar ahora</button>
+      </div>
+      <div class="panel-sec">Últimas reservas</div>
+      <div class="reservas-list">
+        <div class="res-item"><div class="res-av">MR</div><div class="res-info"><div class="res-name">María R.</div><div class="res-detail">Tarta de queso × 2 · hace 4 min</div></div><span class="res-badge rb-app">App</span></div>
+        <div class="res-item"><div class="res-av">JL</div><div class="res-info"><div class="res-name">José L.</div><div class="res-detail">Bomboloni × 1 · hace 9 min</div></div><span class="res-badge rb-local">Local</span></div>
+        <div class="res-item"><div class="res-av">AP</div><div class="res-info"><div class="res-name">Ana P.</div><div class="res-detail">Passion Cake × 1 · hace 15 min</div></div><span class="res-badge rb-app">App</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-item active" id="nav-inicio" onclick="showNav('inicio')"><span class="nav-icon">🏠</span><span class="nav-label">Inicio</span></button>
+  <button class="nav-item" id="nav-mapa" onclick="showNav('mapa')"><span class="nav-icon">🗺️</span><span class="nav-label">Mapa</span></button>
+  <button class="nav-item" id="nav-panel" onclick="showNav('panel')"><span class="nav-icon">⚙️</span><span class="nav-label">Mi local</span></button>
+</nav>
+
+<div class="carrito-bar" id="carrito-bar">
+  <div class="carrito-bar-left"><span class="carrito-badge" id="cb-count">0</span><span class="carrito-text">Ver pedido</span></div>
+  <span class="carrito-total" id="cb-total">0,00€</span>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DB = {
+  giulietta:{emoji:'☕',nombre:'Café Giulietta',barrio:'Jaén Plaza · 0,3 km',seg:218,res:34,
+    pd:{id:'pd1',name:'Bomboloni de Kinder',emoji:'🍩',price:3.60,units:6,desc:'Bollito italiano esponjoso relleno de crema Kinder. Solo hoy.'},
+    carta:[
+      {id:'g1',name:'Tarta de queso especial',emoji:'🍰',price:6.50,desc:'Sirope Lotus · crema secreta · helado vainilla'},
+      {id:'g2',name:'Passion Cake',emoji:'🥕',price:6.80,desc:'Zanahoria especiada · salsa choc. blanco · nata'},
+      {id:'g3',name:'Crepe con salsa secreta',emoji:'🥞',price:7.00,desc:'Receta exclusiva de la casa · solo viernes'},
+      {id:'g4',name:'Rollito de canela',emoji:'🌀',price:4.50,desc:'Masa esponjosa artesanal'},
+      {id:'g5',name:'Brownie americano',emoji:'🍫',price:6.50,desc:'Sirope chocolate · helado vainilla'},
+      {id:'g6',name:'Lotus Cream',emoji:'☕',price:5.00,desc:'Café espresso · sirope Lotus · nata'},
+      {id:'g7',name:'Frappé Queen',emoji:'🧋',price:6.00,desc:'El más vendido · café granizado · dulce de leche'}
+    ]
+  },
+  comercial:{emoji:'🏛️',nombre:'El Comercial',barrio:'Centro · C/ Bernabé Soriano · 0,5 km',seg:176,res:28,
+    pd:{id:'pd4',name:'Tostada de pollo a baja temperatura',emoji:'🍗',price:3.80,units:8,desc:'Aceite, tomate, pollo a baja temperatura y queso. El especial de hoy.'},
+    carta:[
+      {id:'c1',name:'Barraquito',emoji:'☕',price:5.10,desc:'Leche condensada, Licor 43, crema de leche y café'},
+      {id:'c2',name:'Frappé Irlandés',emoji:'🥃',price:5.80,desc:'Café granizado, nata montada y toque de whisky'},
+      {id:'c3',name:'Gofre Kinder',emoji:'🧇',price:4.80,desc:'Gofre artesanal con crema Kinder'},
+      {id:'c4',name:'Tostada de queso de cabra',emoji:'🧀',price:3.80,desc:'Queso de cabra, cebolla caramelizada y mermelada de tomate'},
+      {id:'c5',name:'Tostada ahumados',emoji:'🐟',price:4.50,desc:'Pan de semillas, crema de queso, tomate, ahumados y huevo poché'},
+      {id:'c6',name:'Bowl frutas con yogurt',emoji:'🍓',price:5.50,desc:'Frutas frescas con yogurt y cereales'},
+      {id:'c7',name:'Eiskaffee',emoji:'🍦',price:4.90,desc:'Café solo con bola de helado de vainilla y crema de leche fría'}
+    ]
+  }
+};
+
+let currentCafe = DB.giulietta;
+let carrito = [];
+let payMode = 'app';
+
+function showNav(name) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  const nav = document.getElementById('nav-'+name);
+  if(nav) nav.classList.add('active');
+  document.querySelector('.content').scrollTop=0;
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelector('.content').scrollTop=0;
+}
+
+function showPerfil(id) {
+  const c = DB[id];
+  currentCafe = c;
+  document.getElementById('perfil-emoji').textContent = c.emoji;
+  document.getElementById('perfil-nombre').textContent = c.nombre;
+  document.getElementById('perfil-barrio').textContent = c.barrio;
+  document.getElementById('p-seg').textContent = c.seg;
+  document.getElementById('p-res').textContent = c.res;
+  document.getElementById('p-prod').textContent = c.carta.length+1;
+  const pd = c.pd;
+  document.getElementById('pd-emoji').textContent = pd.emoji;
+  document.getElementById('pd-name').textContent = pd.name;
+  document.getElementById('pd-desc').textContent = pd.desc;
+  document.getElementById('pd-price').textContent = pd.price.toFixed(2).replace('.',',')+'\u20ac';
+  document.getElementById('pd-units').textContent = pd.units;
+  document.getElementById('btn-add-dia').onclick = ()=>addToCart(pd);
+  const lista = document.getElementById('carta-lista');
+  lista.innerHTML='';
+  c.carta.forEach(p=>{
+    const inCart = carrito.find(i=>i.id===p.id);
+    const div = document.createElement('div');
+    div.className='carta-item';
+    div.innerHTML=
+      '<div class="carta-emoji">'+p.emoji+'</div>'+
+      '<div class="carta-info"><div class="carta-name">'+p.name+'</div><div class="carta-desc">'+p.desc+'</div></div>'+
+      '<div class="carta-price">'+p.price.toFixed(2).replace('.',',')+'\u20ac</div>'+
+      '<button class="btn-add-small'+(inCart?' added':'')+'" id="btn-'+p.id+'">'+(inCart?'✓':'+')+'</button>';
+    div.querySelector('.btn-add-small').addEventListener('click',()=>addToCart(p));
+    lista.appendChild(div);
+  });
+  showView('perfil');
+}
+
+function addToCart(producto) {
+  const existing = carrito.find(i=>i.id===producto.id);
+  if(existing){ existing.qty+=1; }
+  else { carrito.push({...producto,qty:1,cafe:currentCafe.nombre}); }
+  updateCart();
+  showToast(producto.emoji+' '+producto.name+' añadido al carrito');
+  const btn = document.getElementById('btn-'+producto.id);
+  if(btn){btn.textContent='✓';btn.classList.add('added');}
+}
+
+function updateCart() {
+  const total = carrito.reduce((s,i)=>s+i.price*i.qty,0);
+  const count = carrito.reduce((s,i)=>s+i.qty,0);
+  const cc = document.getElementById('cart-count');
+  cc.textContent=count;
+  cc.style.display=count>0?'flex':'none';
+  document.getElementById('cart-btn').classList.toggle('has-items',count>0);
+  document.getElementById('cb-count').textContent=count;
+  document.getElementById('cb-total').textContent=total.toFixed(2).replace('.',',')+'\u20ac';
+  document.getElementById('carrito-bar').classList.toggle('visible',count>0);
+}
+
+function renderCheckout() {
+  const cafe = carrito[0]?.cafe||'Cafetería';
+  document.getElementById('checkout-cafe').textContent=cafe+' · Jaén';
+  const items = document.getElementById('checkout-items');
+  items.innerHTML='';
+  carrito.forEach((item,idx)=>{
+    const div=document.createElement('div');
+    div.className='checkout-item';
+    div.innerHTML=
+      '<div class="ci-emoji">'+item.emoji+'</div>'+
+      '<div class="ci-info"><div class="ci-name">'+item.name+'</div><div class="ci-price">'+item.price.toFixed(2).replace('.',',')+'\u20ac / ud</div></div>'+
+      '<div class="ci-qty">'+
+        '<button class="ci-qty-btn" data-idx="'+idx+'" data-d="-1">\u2212</button>'+
+        '<span class="ci-qty-n">'+item.qty+'</span>'+
+        '<button class="ci-qty-btn" data-idx="'+idx+'" data-d="1">+</button>'+
+      '</div>';
+    div.querySelectorAll('.ci-qty-btn').forEach(b=>b.addEventListener('click',()=>{
+      const i=parseInt(b.dataset.idx),d=parseInt(b.dataset.d);
+      carrito[i].qty=Math.max(0,carrito[i].qty+d);
+      if(carrito[i].qty===0) carrito.splice(i,1);
+      updateCart();
+      if(carrito.length===0){showNav('inicio');return;}
+      renderCheckout();
+    }));
+    items.appendChild(div);
+  });
+  const total=carrito.reduce((s,i)=>s+i.price*i.qty,0);
+  document.getElementById('checkout-total').textContent=total.toFixed(2).replace('.',',')+'\u20ac';
+}
+
+function selPay(mode){
+  payMode=mode;
+  document.getElementById('pay-app').classList.toggle('sel',mode==='app');
+  document.getElementById('pay-local').classList.toggle('sel',mode==='local');
+}
+
+function confirmar(){
+  const cafe=carrito[0]?.cafe||'Cafetería';
+  const total=carrito.reduce((s,i)=>s+i.price*i.qty,0);
+  const prods=carrito.map(i=>i.name+' \u00d7'+i.qty).join(', ');
+  document.getElementById('conf-local').textContent=cafe;
+  document.getElementById('conf-prods').textContent=prods;
+  document.getElementById('conf-total').textContent=total.toFixed(2).replace('.',',')+'\u20ac';
+  document.getElementById('conf-pago').textContent=payMode==='app'?'En la app \u2713':'En el local';
+  document.getElementById('conf-code').textContent=Math.floor(1000+Math.random()*9000);
+  document.getElementById('confirm-sub').textContent='Tu pedido te espera en '+cafe;
+  showView('confirm');
+}
+
+function clearCart(){carrito=[];updateCart();}
+function toggleFiltro(btn){document.querySelectorAll('.filtro-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+document.getElementById('carrito-bar').addEventListener('click',()=>{renderCheckout();showView('checkout');});
+document.getElementById('cart-btn').addEventListener('click',()=>{if(!carrito.length){showToast('Tu carrito está vacío');return;}renderCheckout();showView('checkout');});
+</script>
+</body>
+</html>
